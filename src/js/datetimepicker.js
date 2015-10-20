@@ -135,22 +135,16 @@
         '   </tbody>' +
         '</table></div>',
         scope: {
+          datetimepickerConfig: '@',
           onSetTime: '&',
           beforeRender: '&'
         },
         replace: true,
         link: function link(scope, element, attrs, ngModelController) {
 
-          var directiveConfig = {};
-
-          if (attrs.datetimepickerConfig) {
-            directiveConfig = scope.$parent.$eval(attrs.datetimepickerConfig);
-          }
-
-          var configuration = {};
-
+          var configuration = {}
+          var directiveConfig = scope.$eval(attrs.datetimepickerConfig);
           angular.extend(configuration, defaultConfig, directiveConfig);
-
           validateConfiguration(configuration);
 
           var startOfDecade = function startOfDecade(unixDate) {
@@ -403,6 +397,12 @@
           ngModelController.$render = function $render() {
             scope.changeView(configuration.startView, new DateObject({utcDateValue: getUTCTime(ngModelController.$viewValue)}));
           };
+
+          scope.$watch('datetimepickerConfig', function() {
+              angular.extend(configuration, scope.$eval(attrs.datetimepickerConfig));
+              validateConfiguration(configuration);
+              scope.changeView(configuration.startView, new DateObject({utcDateValue: getUTCTime(ngModelController.$viewValue)}));
+          });
         }
       };
     }]);
